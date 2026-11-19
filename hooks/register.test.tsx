@@ -166,3 +166,14 @@ test('the three sections come before any tool call, skill or instruction from an
   expect(rules).toContain('before any tool call or skill')
   expect(rules).toContain('even when the prompt or another mod says to study the code first')
 })
+
+test('the status line clears at the end of a main turn the mod did not see start, as after a reload', async ($, on) => {
+  engine(on)
+  const statuses: (string | undefined)[] = []
+  on('ui.status', (_, e) => (statuses.push(e.text), { value: undefined }))
+
+  await $.turn.complete({ turnId: 't1', answer: '' } as Args<'turn.complete'>)
+  await $.turn.complete({ turnId: 't2', agentId: 'sub-1', answer: '' } as Args<'turn.complete'>)
+
+  expect(statuses).toEqual([undefined])
+})
