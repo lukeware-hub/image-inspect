@@ -79,8 +79,9 @@ export const register: Register = on => {
     return yield* next(isInspected ? { ...e, model: MODEL, effort: EFFORT } : e)
   })
 
+  // Any main turn end clears the status, since a reload forgets the inspected turn.
   on('turn.complete', ($, e, next) => {
-    if (e.turnId === inspectedTurn) {
+    if (!e.agentId) {
       inspectedTurn = undefined
       $.ui.status(undefined)
     }
