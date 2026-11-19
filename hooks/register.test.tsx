@@ -155,3 +155,14 @@ test('the footer keeps what is drawn beneath and toggles the button', async ($, 
     await ui.unmount()
   }
 })
+
+test('the three sections come before any tool call, skill or instruction from another mod', async ($, on) => {
+  const { contexts } = engine(on)
+  await turnOn($)
+
+  await $.prompt.submit(PROMPT)
+
+  const rules = contexts[0]?.[0] ?? ''
+  expect(rules).toContain('before any tool call or skill')
+  expect(rules).toContain('even when the prompt or another mod says to study the code first')
+})
