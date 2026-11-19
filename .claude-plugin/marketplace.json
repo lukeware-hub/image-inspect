@@ -1,0 +1,5 @@
+{
+  "name": "image-inspect",
+  "owner": { "name": "lukeware-hub" },
+  "plugins": [{ "name": "image-inspect", "source": "./" }]
+}

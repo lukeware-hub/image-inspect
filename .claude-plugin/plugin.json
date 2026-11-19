@@ -1,0 +1,6 @@
+{
+  "name": "image-inspect",
+  "version": "0.1.0",
+  "description": "Inspects each image you attach, links it to the conversation and gives a verdict; toggle button above the prompt.",
+  "types": "./types/index.d.ts"
+}
