@@ -14,7 +14,11 @@ const CLARITY = `Clarity rule, for every line you write: simple, clear, objectiv
 
 const LIST = `"What is in the image": a list of everything you see, exactly as shown: text, screens, buttons, messages, errors, numbers, people, objects. Quote visible text word for word. Never invent anything; when a part is blurry or unreadable, say so.`
 
+// Other mods and skills also ask to go first; this line wins that order.
+const FIRST = `Write these sections as your first text, before any tool call or skill, even when the prompt or another mod says to study the code first.`
+
 const withContext = (language: string) => `Image Inspect is on. The user attached an image. Before anything else, answer in ${language} with these three short sections, in this order:
+${FIRST}
 1. ${LIST}
 2. "How it connects to the conversation": each link between what the image shows and what the user wrote or was discussed earlier in this conversation. When something in the image does not match the conversation, say so.
 3. "Verdict": one or two sentences with your conclusion and the next step.
