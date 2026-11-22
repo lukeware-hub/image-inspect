@@ -18,12 +18,17 @@ const STEP = { turnId: 't1', index: 0, model: 'claude-sonnet-5-5', effort: 'high
 const START = { cwd: '/', surface: 'terminal', isInteractive: true } as const
 
 // Stands for the engine: records the context sent and the model and effort of each step.
-function engine(on: On, settings: Record<string, unknown> = {}, stored: Record<string, unknown> | null = {}) {
+function engine(
+  on: On,
+  settings: Record<string, unknown> = {},
+  stored: Record<string, unknown> | null = {},
+  refuse = false,
+) {
   if (stored) mock.store(on, stored)
   const contexts: (readonly string[] | undefined)[] = []
   const steps: { model: string; effort?: unknown }[] = []
   on('settings.read', () => ({ value: settings }))
-  on('prompt.submit', (_, e) => (contexts.push(e.context), { text: e.text }))
+  on('prompt.submit', (_, e) => (contexts.push(e.context), refuse ? { drop: 'refused' } : { text: e.text }))
   on('turn.start', (_, e) => ({ turnId: e.turnId }))
   on('turn.complete', () => ({ text: '', reason: 'end_turn' }) as never)
   on('turn.step', async function* (_, e) {
@@ -105,6 +110,17 @@ test('the inspected turn runs on opus at medium effort, and only that turn', asy
     { model: STEP.model, effort: STEP.effort },
     { model: STEP.model, effort: STEP.effort },
   ])
+})
+
+test('a refused prompt starts no inspection: the next main turn runs on its own model', async ($, on) => {
+  const { steps } = engine(on, {}, {}, true)
+  await turnOn($)
+
+  await $.prompt.submit(PROMPT)
+  await $.turn.start({ text: 'next', turnId: 't2' } as Args<'turn.start'>)
+  await step($, { ...STEP, turnId: 't2' })
+
+  expect(steps).toEqual([{ model: STEP.model, effort: STEP.effort }])
 })
 
 test('the reply language comes from /config', async ($, on) => {

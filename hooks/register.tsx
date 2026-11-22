@@ -61,7 +61,10 @@ export const register: Register = on => {
     const language = await outputLanguage($)
     const rules = e.text.trim().length < MIN_TEXT ? withoutContext(language) : withContext(language)
     isPending = true
-    return next({ ...e, context: [...(e.context ?? []), rules] })
+    const result = await next({ ...e, context: [...(e.context ?? []), rules] })
+    // A refused prompt starts no turn, so the next main turn is not an inspection.
+    if (result.drop !== undefined) isPending = false
+    return result
   }).catch(($, e, next) => next(e))
 
   on('turn.start', ($, e, next) => {
