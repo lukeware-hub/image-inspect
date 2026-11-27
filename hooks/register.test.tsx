@@ -159,7 +159,7 @@ test('the footer keeps what is drawn beneath and toggles the button', async ($, 
     return <Text>engine</Text>
   })
 
-  for (const surface of ['terminal', 'desktop'] as const) {
+  for (const surface of ['terminal'] as const) {
     const ui = await $.ui.mount({ ...FOOTER, surface })
     const label = async () => (await ui.find({ type: 'Button', key: 'toggle' }))?.props.label
 
@@ -170,6 +170,47 @@ test('the footer keeps what is drawn beneath and toggles the button', async ($, 
     expect([before, after].sort()).toEqual(['🔍 Image Inspect: off', '🔍 Image Inspect: on'])
     await ui.unmount()
   }
+})
+
+const BAND = { plugin: 'image-inspect', component: 'AbovePrompt', props: { hasSurvey: false, isCollapsed: false } } as const
+
+function drawBelow(on: On) {
+  mock.store(on, {})
+  on('ui.render', ($, e) => {
+    const { Box } = $.ui.resolve(e)
+    return <Box />
+  })
+}
+
+test('desktop footer has no button of this mod; terminal footer keeps it', async ($, on) => {
+  drawBelow(on)
+  const desktop = await $.ui.mount({ ...FOOTER, surface: 'desktop' } as any)
+  expect(await desktop.find({ type: 'Button', key: 'toggle' })).toBeUndefined()
+  await desktop.unmount()
+  const terminal = await $.ui.mount({ ...FOOTER, surface: 'terminal' } as any)
+  expect(await terminal.find({ type: 'Button', key: 'toggle' })).toBeDefined()
+  await terminal.unmount()
+})
+
+test('desktop band above the prompt has the button and a press toggles it', async ($, on) => {
+  drawBelow(on)
+  const ui = await $.ui.mount({ ...BAND, surface: 'desktop' } as any)
+  const label = async () => (await ui.find({ type: 'Button', key: 'toggle' }))?.props.label
+  const before = await label()
+  await ui.press({ key: 'toggle' })
+  const after = await label()
+  expect([before, after].sort()).toEqual(['🔍 Image Inspect: off', '🔍 Image Inspect: on'])
+  await ui.unmount()
+})
+
+test('the band is skipped on terminal and during a survey', async ($, on) => {
+  drawBelow(on)
+  const terminal = await $.ui.mount({ ...BAND, surface: 'terminal' } as any)
+  expect(await terminal.find({ type: 'Button', key: 'toggle' })).toBeUndefined()
+  await terminal.unmount()
+  const survey = await $.ui.mount({ ...BAND, props: { hasSurvey: true, isCollapsed: false }, surface: 'desktop' } as any)
+  expect(await survey.find({ type: 'Button', key: 'toggle' })).toBeUndefined()
+  await survey.unmount()
 })
 
 test('the three sections come before any tool call, skill or instruction from another mod', async ($, on) => {

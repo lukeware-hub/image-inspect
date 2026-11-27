@@ -18,7 +18,7 @@ That answer runs on the Opus model at medium effort, only for that turn. The nex
 
 ## Use
 
-- A `🔍 Image Inspect` button sits in the prompt footer. Click it to turn the inspection on or off.
+- A `🔍 Image Inspect` button sits in the prompt footer in the terminal, and in a row above the prompt on Claude Code Desktop. Click it to turn the inspection on or off.
 - The command `/image-inspect` does the same.
 - It starts off. Your on or off choice is saved and stays the same in new sessions.
 - Prompts with no image are never changed.
@@ -36,7 +36,7 @@ You need Claude Code installed.
 
 1. Answer `y` to add the marketplace.
 2. Press Enter to install for your user (all your projects).
-3. Done: the `🔍 Image Inspect` button appears in the prompt footer.
+3. Done: the `🔍 Image Inspect` button appears in the prompt footer (terminal) or above the prompt (Desktop).
 
 **From a shell**, the same in one line:
 

@@ -105,7 +105,28 @@ export const register: Register = on => {
   }))
 
   // Footer row: what the engine and other mods draw there, then the toggle.
+  // The desktop footer shows one mod button and folds the rest, so desktop draws its own row above the prompt.
   on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
+    if (e.surface === 'desktop') return next(e)
+    const { Box, Button } = $.ui.resolve(e)
+    const active = await read($, isOn)
+
+    return (
+      <Box>
+        {await next(e)}
+        <Button
+          key="toggle"
+          label={active ? '🔍 Image Inspect: on' : '🔍 Image Inspect: off'}
+          variant={active ? 'primary' : 'secondary'}
+          onPress={() => toggle($)}
+        />
+      </Box>
+    )
+  })
+
+  // Desktop: the band directly above the prompt input.
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    if (e.surface !== 'desktop' || e.props.hasSurvey) return next(e)
     const { Box, Button } = $.ui.resolve(e)
     const active = await read($, isOn)
 
